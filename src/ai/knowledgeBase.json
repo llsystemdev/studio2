@@ -1,0 +1,28 @@
+{
+  "policies": [
+    {
+      "name": "Extensión de Alquiler",
+      "description": "Las extensiones son posibles si el vehículo está disponible. Se debe notificar con al menos 24 horas de antelación. El costo es la tarifa diaria estándar."
+    },
+    {
+      "name": "Cambio de Vehículo",
+      "description": "Es posible realizar un cambio de vehículo (upgrade/downgrade) si hay disponibilidad. Se ajustará el precio."
+    },
+    {
+      "name": "Política de Combustible",
+      "description": "El vehículo se entrega con el tanque lleno y debe ser devuelto igual. De lo contrario, se cobrará una tarifa de repostaje más el costo del combustible faltante."
+    },
+    {
+      "name": "Devolución Tardía",
+      "description": "Se otorga un período de gracia de 1 hora. Después de eso, se cobra una tarifa por hora hasta un máximo del costo de un día completo."
+    },
+    {
+      "name": "Depósito de Seguridad",
+      "description": "El depósito estándar es de $500 USD, se devuelve al finalizar el alquiler si no hay daños."
+    },
+    {
+      "name": "Documentos Necesarios",
+      "description": "Licencia de conducir válida, Cédula o Pasaporte, y tarjeta de crédito para el depósito."
+    }
+  ]
+}

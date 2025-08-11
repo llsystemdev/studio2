@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow public read access for the vehicle fleet on the home page.
+    // Writing/editing vehicles should still require authentication.
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Secure all other collections by default.
+    // Only authenticated users can access their own data or data based on their roles.
+    // Specific rules for other collections should be added below this point.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

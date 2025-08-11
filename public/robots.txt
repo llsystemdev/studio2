@@ -1,0 +1,23 @@
+# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+#
+# Allow all crawling of the public site.
+User-agent: *
+Allow: /
+Allow: /vehiculo/
+
+# Disallow crawling of the admin panel pages.
+Disallow: /login
+Disallow: /dashboard
+Disallow: /reservations
+Disallow: /vehicles
+Disallow: /users
+Disallow: /documents
+Disallow: /invoices
+Disallow: /expenses
+Disallow: /maintenance
+Disallow: /calendar
+Disallow: /smart-reply
+Disallow: /logs
+Disallow: /contrato
+
+Sitemap: https://virtusapp.vercel.app/sitemap.xml

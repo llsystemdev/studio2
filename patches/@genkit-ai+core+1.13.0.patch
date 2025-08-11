@@ -1,0 +1,35 @@
+diff --git a/node_modules/@genkit-ai/core/lib/tracing.js b/node_modules/@genkit-ai/core/lib/tracing.js
+index 72e7371..a1e9411 100644
+--- a/node_modules/@genkit-ai/core/lib/tracing.js
++++ b/node_modules/@genkit-ai/core/lib/tracing.js
+@@ -107,7 +107,7 @@
+         const { NodeSDK } = await import('@opentelemetry/sdk-node');
+         const { JaegerExporter } = await import('@opentelemetry/exporter-jaeger');
+         const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http');
+-        const { getNodeAutoInstrumentations } = await import('@opentelemetry/auto-instrumentations-node');
++        // const { getNodeAutoInstrumentations } = await import('@opentelemetry/auto-instrumentations-node');
+         const { GcpDetector } = await import('@opentelemetry/detector-gcp');
+         const { Resource } = await import('@opentelemetry/resources');
+         let traceExporter;
+@@ -131,7 +131,7 @@
+                 traceExporter,
+                 new opentelemetry.BatchSpanProcessor(traceExporter),
+             ),
+-            instrumentations: [getNodeAutoInstrumentations()],
++            // instrumentations: [getNodeAutoInstrumentations()],
+         });
+         otelSdk.start();
+         (0, logger_1.log)('info', 'Started OpenTelemetry SDK');
+diff --git a/node_modules/@genkit-ai/core/package.json b/node_modules/@genkit-ai/core/package.json
+index fdf81f2..6b78358 100644
+--- a/node_modules/@genkit-ai/core/package.json
++++ b/node_modules/@genkit-ai/core/package.json
+@@ -64,7 +64,6 @@
+     "@opentelemetry/api": "^1.8.0",
+     "@opentelemetry/auto-instrumentations-node": "^0.46.0",
+     "@opentelemetry/detector-gcp": "^0.36.0",
+-    "@opentelemetry/exporter-jaeger": "^1.22.0",
+     "@opentelemetry/exporter-trace-otlp-http": "^0.52.0",
+     "@opentelemetry/resources": "^1.22.0",
+     "@opentelemetry/sdk-node": "^0.52.0",
+

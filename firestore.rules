@@ -1,0 +1,59 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Helper function to check for Admin role from custom claims
+    function isAdmin() {
+      return request.auth.token.role == 'Admin';
+    }
+
+    // Helper function to check for any staff role (Admin, Supervisor, Secretary)
+    function isStaff() {
+      return request.auth.token.role in ['Admin', 'Supervisor', 'Secretary'];
+    }
+    
+    // Helper function to check if the user is the owner of the document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Vehicles: Publicly readable, but only writable by staff.
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Users: Readable by all authenticated users, writable only by Admins.
+    // This allows staff to see user lists without being able to modify roles.
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    
+    // Customers: Only the customer themselves or staff can read/write.
+    match /customers/{customerId} {
+      allow get: if isOwner(customerId) || isStaff();
+      allow list: if isStaff(); // Only staff can list all customers
+      allow create, update: if isOwner(customerId) || isStaff();
+      allow delete: if isAdmin(); // Only admins can delete customers
+    }
+    
+    // Reservations, Contracts, Invoices, Documents, Reviews: 
+    // Readable by the owner or staff. Writable only by staff.
+    // This uses a collection group match for efficiency.
+    match /{collection}/{docId} 
+        where collection in ['reservations', 'contracts', 'invoices', 'documents', 'reviews'] {
+      allow get: if isStaff() || (resource.data.customerId == request.auth.uid);
+      allow list: if isStaff();
+      allow create, update: if isStaff() || (collection == 'reviews' && request.auth.uid == request.resource.data.customerId); // Customer can create reviews
+      allow delete: if isAdmin();
+    }
+
+    // Expenses, MaintenanceLogs, activityLogs: Internal collections, only staff can access.
+    match /{collection}/{logId} where collection in ['expenses', 'maintenanceLogs', 'activityLogs'] {
+      allow read, write: if isStaff();
+    }
+  }
+}

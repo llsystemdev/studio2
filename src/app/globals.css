@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 352 100% 40%; /* #cc0013 */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%; /* Increased contrast from 35% */
+
+    --accent: 352 80% 96%; /* Lighter shade of primary for hover */
+    --accent-foreground: 352 100% 40%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 352 100% 40%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 352 100% 40%;
+    --chart-2: 0 0% 63%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    
+    /* Custom Admin Sidebar colors */
+    --sidebar-background: 240 5% 15%; /* Darker gray for sidebar */
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 352 70% 55%; 
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 25%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 5% 25%;
+    --sidebar-ring: 352 70% 55%;
+  }
+
+  .dark {
+    --background: 224 71% 4%; /* Dark blue for admin */
+    --foreground: 0 0% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 352 70% 55%; /* Lighter red for dark mode */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 352 70% 55%;
+    
+    /* Custom Admin Sidebar colors (can be same as light or different) */
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 352 70% 55%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 352 70% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
