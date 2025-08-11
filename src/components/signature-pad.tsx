@@ -1,7 +1,7 @@
 
 'use client';
 
-import *delineate react from 'react';
+import * as React from 'react';
 
 const SignaturePad = React.forwardRef<
     { getSignature: () => Blob | null; clear: () => void },
@@ -89,28 +89,26 @@ const SignaturePad = React.forwardRef<
         }
     };
     
-    const getSignature = (): Blob | null => {
+    const getSignature = (): Promise<Blob | null> => {
         const canvas = canvasRef.current;
-        let blob: Blob | null = null;
-        if (canvas) {
-            // Check if canvas is empty
-            const context = getContext();
-            if (context) {
-                const pixelBuffer = new Uint32Array(
-                    context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-                );
-                if (!pixelBuffer.some(color => color !== 0)) {
-                    return null; // Is empty
-                }
+        if (!canvas) return Promise.resolve(null);
+
+        // Check if canvas is empty
+        const context = getContext();
+        if (context) {
+            const pixelBuffer = new Uint32Array(
+                context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+            );
+            if (!pixelBuffer.some(color => color !== 0)) {
+                return Promise.resolve(null); // Is empty
             }
-            // Use a promise to handle the async toBlob call
-            return new Promise((resolve) => {
-                canvas.toBlob((b) => {
-                    resolve(b);
-                }, 'image/png');
-            }).then(b => b as Blob);
         }
-        return null;
+        
+        return new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/png');
+        });
     };
     
     // Expose methods via ref
