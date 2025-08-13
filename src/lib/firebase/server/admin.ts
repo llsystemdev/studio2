@@ -1,4 +1,3 @@
-
 // Explicitly load environment variables from .env file FIRST.
 // This is the crucial fix to ensure server-side code has access to credentials.
 import * as dotenv from 'dotenv';
