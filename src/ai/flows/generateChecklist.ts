@@ -12,6 +12,8 @@ import { z } from 'zod';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Reservation, Vehicle } from '@/lib/types';
+import { prompt } from '@genkit-ai/ai';
+import { flow } from '@genkit-ai/core';
 
 
 export const ChecklistInputSchema = z.object({
@@ -67,7 +69,7 @@ export async function generateChecklist(reservation: Reservation, vehicle: Vehic
 }
 
 
-const prompt = ai.definePrompt({
+const checklistPrompt = prompt({
   name: 'generateChecklistPrompt',
   input: { schema: ChecklistInputSchema },
   output: { schema: ChecklistOutputSchema },
@@ -82,14 +84,14 @@ const prompt = ai.definePrompt({
   `,
 });
 
-const checklistFlow = ai.defineFlow(
+const checklistFlow = flow(
   {
     name: 'generateChecklistFlow',
     inputSchema: ChecklistInputSchema,
     outputSchema: ChecklistOutputSchema,
   },
   async (input: ChecklistInput) => {
-    const { output } = await prompt(input);
+    const { output } = await checklistPrompt(input);
     if (!output) {
       throw new Error('The AI model failed to generate a checklist.');
     }

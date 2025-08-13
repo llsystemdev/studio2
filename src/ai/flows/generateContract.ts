@@ -13,6 +13,8 @@ import { z } from 'zod';
 import { getDb } from '@/lib/firebase/server/admin';
 import { differenceInCalendarDays } from 'date-fns';
 import type { Reservation, Vehicle } from '@/lib/types';
+import { prompt } from '@genkit-ai/ai';
+import { flow } from '@genkit-ai/core';
 
 export const GenerateContractInputSchema = z.object({
   clientName: z.string(),
@@ -106,7 +108,7 @@ export async function generateContract(
 }
 
 
-const prompt = ai.definePrompt({
+const contractPrompt = prompt({
     name: 'generateContractPrompt',
     input: { schema: GenerateContractInputSchema },
     output: { schema: GenerateContractOutputSchema },
@@ -147,14 +149,14 @@ const prompt = ai.definePrompt({
 });
 
 
-const contractFlow = ai.defineFlow(
+const contractFlow = flow(
   {
     name: 'generateContractFlow',
     inputSchema: GenerateContractInputSchema,
     outputSchema: GenerateContractOutputSchema,
   },
   async (input: GenerateContractInput) => {
-    const { output } = await prompt(input);
+    const { output } = await contractPrompt(input);
     if (!output) {
       throw new Error('The AI model failed to generate a contract output.');
     }
