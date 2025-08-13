@@ -86,16 +86,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [userProfile]);
   
   const createSessionCookie = async (user: User) => {
-    const idToken = await user.getIdToken(true);
-    const response = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
-    });
+    try {
+        const idToken = await user.getIdToken(true);
+        const response = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+        });
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Server-side session creation failed.' }));
-        throw new Error(errorData.error);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Server-side session creation failed.' }));
+            throw new Error(errorData.error);
+        }
+    } catch (error) {
+        console.error("Failed to create session cookie:", error);
+        // We can sign the user out if session creation fails to prevent an inconsistent state.
+        await signOut(auth);
+        throw new Error('Failed to establish a secure session with the server.');
     }
   };
 
@@ -103,49 +110,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       setLoading(true);
       if (authUser) {
-        await createSessionCookie(authUser);
-        setUser(authUser);
-        
-        // Execute post-auth action if it exists and we're on the right page
-        if (postAuthAction && postAuthAction.redirectUrl === pathname) {
-            postAuthAction.callback(authUser);
-            setPostAuthAction(null); // Clear the action after execution
-        }
-        
-        const userDocRef = doc(db, 'users', authUser.uid);
-        const unsubscribeSnapshot = onSnapshot(userDocRef, (userDocSnap) => {
-            if (userDocSnap.exists()) {
-              const profileData = { id: userDocSnap.id, ...userDocSnap.data() } as UserProfile;
-              setUserProfile(profileData);
-              const roleFromDb = profileData.role;
-              setRole(roleFromDb);
-            } else {
-              // This is a client user if they exist in Auth but not in the 'users' collection
-              const clientProfile: UserProfile = {
-                  id: authUser.uid,
-                  name: authUser.displayName || 'Nuevo Cliente',
-                  email: authUser.email || '',
-                  role: 'Client',
-              };
-              setUserProfile(clientProfile);
-              setRole('Client');
-              // Create a customer document if it doesn't exist
-              const customerDocRef = doc(db, 'customers', authUser.uid);
-              setDoc(customerDocRef, {
-                  name: authUser.displayName,
-                  email: authUser.email,
-                  id: authUser.uid,
-                  createdAt: new Date().toISOString()
-              }, { merge: true });
+        try {
+            await createSessionCookie(authUser);
+            setUser(authUser);
+            
+            // Execute post-auth action if it exists and we're on the right page
+            if (postAuthAction && postAuthAction.redirectUrl === pathname) {
+                postAuthAction.callback(authUser);
+                setPostAuthAction(null); // Clear the action after execution
             }
-            setLoading(false);
-        }, (error) => {
-            console.error("Firestore snapshot error on user doc:", error);
+            
+            const userDocRef = doc(db, 'users', authUser.uid);
+            const unsubscribeSnapshot = onSnapshot(userDocRef, (userDocSnap) => {
+                if (userDocSnap.exists()) {
+                  const profileData = { id: userDocSnap.id, ...userDocSnap.data() } as UserProfile;
+                  setUserProfile(profileData);
+                  const roleFromDb = profileData.role;
+                  setRole(roleFromDb);
+                } else {
+                  // This is a client user if they exist in Auth but not in the 'users' collection
+                  const clientProfile: UserProfile = {
+                      id: authUser.uid,
+                      name: authUser.displayName || 'Nuevo Cliente',
+                      email: authUser.email || '',
+                      role: 'Client',
+                  };
+                  setUserProfile(clientProfile);
+                  setRole('Client');
+                  // Create a customer document if it doesn't exist
+                  const customerDocRef = doc(db, 'customers', authUser.uid);
+                  setDoc(customerDocRef, {
+                      name: authUser.displayName,
+                      email: authUser.email,
+                      id: authUser.uid,
+                      createdAt: new Date().toISOString()
+                  }, { merge: true });
+                }
+                setLoading(false);
+            }, (error) => {
+                console.error("Firestore snapshot error on user doc:", error);
+                setUserProfile(null);
+                setRole(null);
+                setLoading(false);
+            });
+             return () => unsubscribeSnapshot();
+        } catch (error) {
+            console.error("Auth state change error:", error);
+            // If session creation fails, ensure we have a clean state.
+            setUser(null);
             setUserProfile(null);
             setRole(null);
             setLoading(false);
-        });
-         return () => unsubscribeSnapshot();
+        }
       } else {
         setUser(null);
         setUserProfile(null);
